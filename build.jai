@@ -1,4 +1,5 @@
 #import "Compiler";
+#import "Process";
 Basic :: #import "Basic";
 
 #if OS == .WINDOWS
@@ -8,7 +9,7 @@ Basic :: #import "Basic";
 }
 
 #run {
-    executable_name := "a.out";
+    executable_name := "game";
 
     w := compiler_create_workspace();
     options := get_build_options(w);
@@ -37,12 +38,17 @@ Basic :: #import "Basic";
 
     add_build_file("main.jai", w);
 
+    runGame := false;
     while true
     {
         message := compiler_wait_for_message();
-
         if message.kind == .COMPLETE
+        {
+            messageComplete := cast(*Message_Complete)message;
+            if messageComplete.error_code == .NONE
+                runGame = true;
             break;
+        }
     }
     compiler_end_intercept(w);
 
@@ -58,5 +64,7 @@ Basic :: #import "Basic";
         Windows_Resources.add_manifest_to_executable(exe_name, manifest_options);
     }
     set_build_options_dc(.{do_output=false});
+    if runGame
+        run_command("./game");
 }
 

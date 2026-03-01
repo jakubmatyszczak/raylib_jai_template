@@ -1,7 +1,7 @@
 TexId :: enum u32
 {
     NONE :: 0;
-    BOX :: 1;
+    ATLAS_BOXES :: 1;
 }
 SfxId :: enum u32
 {
@@ -17,7 +17,7 @@ Content :: struct
 }
 content_init :: (c : *Content)
 {
-    c.textures[TexId.BOX] = rl.LoadTexture("res/box.png");
+    c.textures[TexId.ATLAS_BOXES] = rl.LoadTexture("res/atlas_boxes.png");
 
     c.sfx[SfxId.BONK] = rl.LoadSound("res/sfx/bonk.mp3");
 }
@@ -41,33 +41,4 @@ Globals :: struct
     time : float;
 }
 g := Globals.{};
-
-polarToXY :: (angle: float, radius : float) -> Vector2
-{
-    xy : Vector2 = ---;
-    xy.x = sin(angle) * radius;
-    xy.y = cos(angle) * radius;
-    return xy;
-}
-radToDeg :: (angle: float) -> float
-{
-    ratio :: 180. / 3.14159;
-    return angle * ratio;
-}
-clamp :: (min: float, max: float, value: float) -> float
-{
-    if value < min
-        return min;
-    if value > max
-        return max;
-    return value;
-}
-random_vector2 :: (range : float) -> Vector2
-{
-    return .{random_get_within_range(-range, range), random_get_within_range(-range, range)};
-}
-random_float :: (min: float = 0., max : float = 1.) -> float
-{
-    return random_get_within_range(min, max);
-}
 

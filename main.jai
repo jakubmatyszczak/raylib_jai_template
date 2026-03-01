@@ -1,15 +1,18 @@
 Basic :: #import "Basic";
 #import "Math";
 #import "Random";
-rl :: #import "raylib";
+
 #load "src/global.jai";
+
+rl :: #import "raylib";
+engine :: #import "mengine";
 
 main :: ()
 {
     random_seed(Basic.current_time_monotonic().low);
     g.screenSize = .{1920, 1080};
-    g.renderSize = .{384, 216};
-    rl.InitWindow(xx g.screenSize.x, xx g.screenSize.y, "no.6");
+    g.renderSize = .{1920, 1080};
+    rl.InitWindow(xx g.screenSize.x, xx g.screenSize.y, "game");
     rl.InitAudioDevice();
     content_init(*g.content);
     g.renderTarget= rl.LoadRenderTexture(xx g.renderSize.x, xx g.renderSize.y);
@@ -17,8 +20,6 @@ main :: ()
     rl.SetTargetFPS(60);
     // rl.ToggleFullscreen();
 
-    // while game(*music)
-    //     reset_state();
     game();
 
     if rl.IsWindowFullscreen()
@@ -31,6 +32,9 @@ game :: () -> bool
     start := true;
     g.camera = .{offset= .{xx (g.renderSize.x / 2), xx (g.renderSize.y / 2)},
                     target=.{0,0}, rotation=0., zoom=1.};
+
+    default := engine.drawQueue_make(.{32., 32.});
+
     while start
     {
         dt := rl.GetFrameTime();
@@ -45,25 +49,25 @@ game :: () -> bool
             sound_play(SfxId.BONK);
 
         if(rl.IsKeyDown(rl.KeyboardKey.KEY_W))
-            g.camera.target.y += 0.5;
+            g.camera.target.y += 10.5;
         if(rl.IsKeyDown(rl.KeyboardKey.KEY_S))
-            g.camera.target.y -= 0.5;
+            g.camera.target.y -= 10.5;
         if(rl.IsKeyDown(rl.KeyboardKey.KEY_A))
-            g.camera.target.x += 0.5;
+            g.camera.target.x += 10.5;
         if(rl.IsKeyDown(rl.KeyboardKey.KEY_D))
-            g.camera.target.x -= 0.5;
+            g.camera.target.x -= 10.5;
+
+        engine.drawQueue_add(*default, .{0., 0.}, pos = {0., 0.}, rot = g.time * 60.);
+        engine.drawQueue_add(*default, .{1., 0.}, pos = {0., 50.});
+        engine.drawQueue_add(*default, .{2., 0.}, pos = {0., 100.});
 
         //draw
-        rl.BeginTextureMode(g.renderTarget);
+        rl.BeginDrawing();
         rl.DrawRectangleGradientV(0, 0, xx g.screenSize.x, xx g.screenSize.y, .{140, 190, 124, 255}, .{92, 140, 77, 255});
         rl.BeginMode2D(g.camera);
-            rl.DrawTexturePro(g.content.textures[TexId.BOX], .{0, 0, 32, 32}, .{0, 0, 32, 32}, .{16, 16}, g.time * 16., rl.RED);
+            engine.drawQueue_draw(*default, g.content.textures[TexId.ATLAS_BOXES]);
         rl.EndMode2D();
-        rl.EndTextureMode();
-
-        rl.BeginDrawing();
-            rl.DrawTexturePro(g.renderTarget.texture, .{0, 0, xx g.renderTarget.texture.width, xx g.renderTarget.texture.height}, .{0., 0., xx g.screenSize.x, xx g.screenSize.y}, .{}, 0., rl.WHITE);
-            rl.DrawFPS(25,25);
+        rl.DrawFPS(25,25);
         rl.EndDrawing();
     }
     return false;
