@@ -1,0 +1,3 @@
+[submodule "modules/mengine"]
+	path = modules/mengine
+	url = git@github.com:jakubmatyszczak/mengine.git
